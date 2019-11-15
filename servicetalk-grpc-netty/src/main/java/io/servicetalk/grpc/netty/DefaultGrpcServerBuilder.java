@@ -24,6 +24,8 @@ import io.servicetalk.grpc.api.GrpcServiceFactory;
 import io.servicetalk.grpc.api.GrpcServiceFactory.ServerBinder;
 import io.servicetalk.http.api.BlockingHttpService;
 import io.servicetalk.http.api.BlockingStreamingHttpService;
+import io.servicetalk.http.api.DefaultHttpExecutionContext;
+import io.servicetalk.http.api.HttpExecutionStrategy;
 import io.servicetalk.http.api.HttpProtocolConfig;
 import io.servicetalk.http.api.HttpServerBuilder;
 import io.servicetalk.http.api.HttpServerSecurityConfigurator;
@@ -122,8 +124,10 @@ final class DefaultGrpcServerBuilder extends GrpcServerBuilder implements Server
 
     @Override
     protected Single<ServerContext> doListen(final GrpcServiceFactory<?, ?, ?> serviceFactory) {
-        ExecutionContext executionContext = contextBuilder.build();
-        return serviceFactory.bind(this, executionContext);
+        ExecutionContext ctx = contextBuilder.build();
+        return serviceFactory.bind(this,
+                new DefaultHttpExecutionContext(ctx.bufferAllocator(), ctx.ioExecutor(), ctx.executor(),
+                        (HttpExecutionStrategy) ctx.executionStrategy()));
     }
 
     @Override

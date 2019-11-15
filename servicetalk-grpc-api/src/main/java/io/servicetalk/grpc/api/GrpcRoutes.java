@@ -23,7 +23,7 @@ import io.servicetalk.concurrent.api.Publisher;
 import io.servicetalk.concurrent.api.Single;
 import io.servicetalk.grpc.api.GrpcRouter.RouteProviders;
 import io.servicetalk.grpc.api.GrpcServiceFactory.ServerBinder;
-import io.servicetalk.transport.api.ExecutionContext;
+import io.servicetalk.http.api.HttpExecutionContext;
 import io.servicetalk.transport.api.ServerContext;
 
 import static io.servicetalk.concurrent.api.Completable.completed;
@@ -53,11 +53,11 @@ public abstract class GrpcRoutes<Service extends GrpcService> {
      * <a href="https://www.grpc.io">gRPC</a> service for the server.
      *
      * @param binder {@link ServerBinder} to bind <a href="https://www.grpc.io">gRPC</a> service to the server.
-     * @param executionContext {@link ExecutionContext} to use for the service.
+     * @param executionContext {@link HttpExecutionContext} to use for the service.
      * @return A {@link Single} that completes when the server is successfully started or terminates with an error if
      * the server could not be started.
      */
-    final Single<ServerContext> bind(final ServerBinder binder, final ExecutionContext executionContext) {
+    final Single<ServerContext> bind(final ServerBinder binder, final HttpExecutionContext executionContext) {
         return routeBuilder.build().bind(binder, executionContext);
     }
 

@@ -19,6 +19,7 @@ import io.servicetalk.concurrent.api.Single;
 import io.servicetalk.grpc.api.GrpcRoutes.AllGrpcRoutes;
 import io.servicetalk.http.api.BlockingHttpService;
 import io.servicetalk.http.api.BlockingStreamingHttpService;
+import io.servicetalk.http.api.HttpExecutionContext;
 import io.servicetalk.http.api.HttpService;
 import io.servicetalk.http.api.StreamingHttpService;
 import io.servicetalk.transport.api.ExecutionContext;
@@ -73,7 +74,7 @@ public abstract class GrpcServiceFactory<Filter extends Service, Service extends
      * @return A {@link Single} that completes when the server is successfully started or terminates with an error if
      * the server could not be started.
      */
-    public final Single<ServerContext> bind(final ServerBinder binder, final ExecutionContext executionContext) {
+    public final Single<ServerContext> bind(final ServerBinder binder, final HttpExecutionContext executionContext) {
         if (filterFactory == null) {
             return routes.bind(binder, executionContext);
         }
