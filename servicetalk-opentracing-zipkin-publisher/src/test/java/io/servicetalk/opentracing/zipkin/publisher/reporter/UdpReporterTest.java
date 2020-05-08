@@ -71,25 +71,25 @@ public class UdpReporterTest {
 
     @Test
     public void testJsonV1RoundTrip() throws Exception {
-        testRoundTrip(UdpReporter.Codec.JSON_V1, SpanBytesDecoder.JSON_V1);
+        testRoundTrip(Codec.JSON_V1, SpanBytesDecoder.JSON_V1);
     }
 
     @Test
     public void testJsonV2RoundTrip() throws Exception {
-        testRoundTrip(UdpReporter.Codec.JSON_V2, SpanBytesDecoder.JSON_V2);
+        testRoundTrip(Codec.JSON_V2, SpanBytesDecoder.JSON_V2);
     }
 
     @Test
     public void testThriftRoundTrip() throws Exception {
-        testRoundTrip(UdpReporter.Codec.THRIFT, SpanBytesDecoder.THRIFT);
+        testRoundTrip(Codec.THRIFT, SpanBytesDecoder.THRIFT);
     }
 
     @Test
     public void testProto3RoundTrip() throws Exception {
-        testRoundTrip(UdpReporter.Codec.PROTO3, SpanBytesDecoder.PROTO3);
+        testRoundTrip(Codec.PROTO3, SpanBytesDecoder.PROTO3);
     }
 
-    private void testRoundTrip(UdpReporter.Codec codec, SpanBytesDecoder decoder) throws Exception {
+    private void testRoundTrip(Codec codec, SpanBytesDecoder decoder) throws Exception {
         try (TestReceiver receiver = new TestReceiver(decoder)) {
             try (UdpReporter reporter = buildReporter((InetSocketAddress) receiver.channel.localAddress(), codec)) {
                 Span span = Span.newBuilder()
@@ -130,7 +130,7 @@ public class UdpReporterTest {
         }
     }
 
-    private UdpReporter buildReporter(InetSocketAddress remoteAddress, UdpReporter.Codec codec) {
+    private UdpReporter buildReporter(InetSocketAddress remoteAddress, Codec codec) {
         return new UdpReporter.Builder(remoteAddress)
                 .codec(codec)
                 .build();

@@ -21,7 +21,9 @@ import zipkin2.Span;
 import zipkin2.reporter.Reporter;
 
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,10 +33,13 @@ import static java.util.Objects.requireNonNull;
 public final class LoggingReporter implements Reporter<Span> {
     private final Logger logger;
     private final LogLevel logLevel;
+    private final Function<Span, String> encoder;
 
     private LoggingReporter(Builder builder) {
         this.logger = LoggerFactory.getLogger(builder.loggerName);
         this.logLevel = builder.logLevel;
+        this.encoder = builder.codec == null ? Span::toString :
+                span -> new String(builder.codec.encoder.encode(span));
     }
 
     /**
@@ -43,6 +48,8 @@ public final class LoggingReporter implements Reporter<Span> {
     public static final class Builder {
         private final String loggerName;
         private LogLevel logLevel = LogLevel.INFO;
+        @Nullable
+        private Codec codec;
 
         /**
          * Creates a new instance.
@@ -63,6 +70,17 @@ public final class LoggingReporter implements Reporter<Span> {
          */
         public Builder logLevel(LogLevel logLevel) {
             this.logLevel = requireNonNull(logLevel);
+            return this;
+        }
+
+        /**
+         * Sets the {@link Codec} to encode the Spans with.
+         *
+         * @param codec the codec to use for this span.
+         * @return {@code this}
+         */
+        public Builder codec(Codec codec) {
+            this.codec = requireNonNull(codec);
             return this;
         }
 
@@ -95,15 +113,10 @@ public final class LoggingReporter implements Reporter<Span> {
         }
     }
 
-    /**
-     * Logs a {@link Span} to the configured logger.
-     *
-     * @param span {@link Span} to log
-     */
-    @Override
     public void report(Span span) {
         if (logLevel.isEnabled.test(logger)) {
-            logLevel.log.accept(logger, requireNonNull(span).toString());
+            requireNonNull(span);
+            logLevel.log.accept(logger, encoder.apply(span));
         }
     }
 }
